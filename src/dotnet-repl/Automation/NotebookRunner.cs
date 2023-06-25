@@ -72,6 +72,32 @@ public class NotebookRunner
             StringBuilder? stdOut = default;
             StringBuilder? stdErr = default;
 
+            Action<string> printCommand = (status) => {
+                var elapsed = DateTimeOffset.Now - startTime;
+                var elapsedString = elapsed.TotalSeconds < 1
+                    ? $"{elapsed.TotalMilliseconds}ms"
+                    : $"{elapsed.TotalSeconds}s";
+
+                var statusColor = status switch
+                {
+                    "Success" => "green",
+                    _ => "red"
+                };
+
+                AnsiConsole.Console.WriteLine();
+
+                var rule = new Rule(Markup.Escape($"[{elapsedString}] {element.KernelName}"));
+                rule.LeftJustified();
+                rule.RuleStyle(statusColor);
+                AnsiConsole.Console.Write(rule);
+
+                AnsiConsole.Console.Write(new Text(Markup.Escape(element.Contents)));
+
+                AnsiConsole.Console.WriteLine();
+
+                dotnet_repl.AnsiConsoleExtensions.RenderBufferedStandardOutAndErr(AnsiConsole.Console, theme, stdOut, stdErr);
+            };
+
             var outputs = new List<InteractiveDocumentOutputElement>();
 
             using var _ = events.Subscribe(@event =>
@@ -133,7 +159,7 @@ public class NotebookRunner
                     case CommandFailed failed when failed.Command == command:
                         if (CreateBufferedStandardOutAndErrElement(stdOut, stdErr) is { } te)
                         {
-                            dotnet_repl.AnsiConsoleExtensions.RenderBufferedStandardOutAndErr(AnsiConsole.Console, theme, stdOut, stdErr);
+                            printCommand("Error");
                             outputs.Add(te);
                         }
 
@@ -145,7 +171,7 @@ public class NotebookRunner
                     case CommandSucceeded succeeded when succeeded.Command == command:
                         if (CreateBufferedStandardOutAndErrElement(stdOut, stdErr) is { } textElement)
                         {
-                            dotnet_repl.AnsiConsoleExtensions.RenderBufferedStandardOutAndErr(AnsiConsole.Console, theme, stdOut, stdErr);
+                            printCommand("Success");
                             outputs.Add(textElement);
                         }
 
