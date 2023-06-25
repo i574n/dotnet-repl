@@ -12,6 +12,8 @@ using Microsoft.DotNet.Interactive.Documents;
 using Microsoft.DotNet.Interactive.Documents.Jupyter;
 using Microsoft.DotNet.Interactive.Events;
 
+using Spectre.Console;
+
 namespace Automation;
 
 public class NotebookRunner
@@ -29,6 +31,7 @@ public class NotebookRunner
         CancellationToken cancellationToken = default)
     {
         var resultDocument = new InteractiveDocument();
+        var theme = new CSharpTheme();
 
         if (parameters is not null)
         {
@@ -130,6 +133,7 @@ public class NotebookRunner
                     case CommandFailed failed when failed.Command == command:
                         if (CreateBufferedStandardOutAndErrElement(stdOut, stdErr) is { } te)
                         {
+                            dotnet_repl.AnsiConsoleExtensions.RenderBufferedStandardOutAndErr(AnsiConsole.Console, theme, stdOut, stdErr);
                             outputs.Add(te);
                         }
 
@@ -141,6 +145,7 @@ public class NotebookRunner
                     case CommandSucceeded succeeded when succeeded.Command == command:
                         if (CreateBufferedStandardOutAndErrElement(stdOut, stdErr) is { } textElement)
                         {
+                            dotnet_repl.AnsiConsoleExtensions.RenderBufferedStandardOutAndErr(AnsiConsole.Console, theme, stdOut, stdErr);
                             outputs.Add(textElement);
                         }
 
