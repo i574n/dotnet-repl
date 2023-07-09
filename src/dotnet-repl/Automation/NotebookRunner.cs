@@ -82,13 +82,15 @@ public class NotebookRunner
                     ? $"{elapsed.TotalMilliseconds}ms"
                     : $"{elapsed.TotalSeconds}s";
 
+                Style statusColor = new(status == true ? Color.Green : status == false ? Color.Red : Color.LightSlateGrey);
+
                 AnsiConsole.Console.WriteLine();
 
                 if (kernelName != null)
                 {
                     var rule = new Rule(kernelName);
                     rule.LeftJustified();
-                    rule.RuleStyle(status == true ? "green" : status == false ? "red" : "grey");
+                    rule.RuleStyle(statusColor);
                     AnsiConsole.Console.Write(rule);
                 }
 
@@ -99,13 +101,15 @@ public class NotebookRunner
 
                 if (output.HasValue) {
                     (string? outputHeader, string? outputText) = output.Value;
-                    AnsiConsole.Console.Write(
-                        new Panel(Markup.Escape(outputText ?? ""))
-                            .Header(status != null ? Markup.Escape($"[ {elapsedString} - {outputHeader} ]") : "")
-                            .Expand()
-                            .RoundedBorder()
-                            .BorderStyle(new(status == true ? Color.Green : status == false ? Color.Red : Color.Grey))
-                    );
+                    if (outputText?.Trim().Length > 0) {
+                        AnsiConsole.Console.Write(
+                            new Panel(Markup.Escape(outputText ?? ""))
+                                .Header(status != null ? Markup.Escape($"[ {elapsedString} - {outputHeader} ]") : "")
+                                .Expand()
+                                .RoundedBorder()
+                                .BorderStyle(statusColor)
+                        );
+                    }
                 }
             }
 
@@ -119,7 +123,7 @@ public class NotebookRunner
                     case IncompleteCodeSubmissionReceived incomplete when incomplete.Command == command:
                         break;
 
-                    case CompleteCodeSubmissionReceived complete when complete.Command == command:
+                    case CompleteCodeSubmissionReceived complete:
                         break;
 
                     case CodeSubmissionReceived codeSubmissionReceived:
