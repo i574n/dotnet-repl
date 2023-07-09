@@ -11,7 +11,6 @@ using Microsoft.DotNet.Interactive.Commands;
 using Microsoft.DotNet.Interactive.Documents;
 using Microsoft.DotNet.Interactive.Documents.Jupyter;
 using Microsoft.DotNet.Interactive.Events;
-
 using Spectre.Console;
 
 namespace Automation;
@@ -31,7 +30,6 @@ public class NotebookRunner
         CancellationToken cancellationToken = default)
     {
         var resultDocument = new InteractiveDocument();
-        var theme = new CSharpTheme();
 
         if (parameters is not null)
         {
