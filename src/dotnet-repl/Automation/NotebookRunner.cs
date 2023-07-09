@@ -56,6 +56,9 @@ public class NotebookRunner
             }
         }
 
+        var elementSubmissionMap = new Dictionary<int, HashSet<string>>();
+        var elementIndex = -1;
+
         foreach (var element in notebook.Elements)
         {
             var command = new SubmitCode(element.Contents, element.KernelName);
@@ -72,33 +75,43 @@ public class NotebookRunner
             StringBuilder? stdOut = default;
             StringBuilder? stdErr = default;
 
-            Action<string> printCommand = (status) => {
+            var outputs = new List<InteractiveDocumentOutputElement>();
+
+
+            void printCell(bool? status, string? kernelName, string? code, (string?, string?)? output) {
                 var elapsed = DateTimeOffset.Now - startTime;
                 var elapsedString = elapsed.TotalSeconds < 1
                     ? $"{elapsed.TotalMilliseconds}ms"
                     : $"{elapsed.TotalSeconds}s";
 
-                var statusColor = status switch
+                AnsiConsole.Console.WriteLine();
+
+                if (kernelName != null)
                 {
-                    "Success" => "green",
-                    _ => "red"
-                };
+                    var rule = new Rule(kernelName);
+                    rule.LeftJustified();
+                    rule.RuleStyle(status == true ? "green" : status == false ? "red" : "grey");
+                    AnsiConsole.Console.Write(rule);
+                }
 
-                AnsiConsole.Console.WriteLine();
+                if (code != null) {
+                    AnsiConsole.Console.Write(new Text(Markup.Escape(code)));
+                    AnsiConsole.Console.WriteLine();
+                }
 
-                var rule = new Rule(Markup.Escape($"[{elapsedString}] {element.KernelName}"));
-                rule.LeftJustified();
-                rule.RuleStyle(statusColor);
-                AnsiConsole.Console.Write(rule);
+                if (output.HasValue) {
+                    (string? outputHeader, string? outputText) = output.Value;
+                    AnsiConsole.Console.Write(
+                        new Panel(Markup.Escape(outputText ?? ""))
+                            .Header(status != null ? Markup.Escape($"[ {elapsedString} - {outputHeader} ]") : "")
+                            .Expand()
+                            .RoundedBorder()
+                            .BorderStyle(new(status == true ? Color.Green : status == false ? Color.Red : Color.Grey))
+                    );
+                }
+            }
 
-                AnsiConsole.Console.Write(new Text(Markup.Escape(element.Contents)));
-
-                AnsiConsole.Console.WriteLine();
-
-                dotnet_repl.AnsiConsoleExtensions.RenderBufferedStandardOutAndErr(AnsiConsole.Console, theme, stdOut, stdErr);
-            };
-
-            var outputs = new List<InteractiveDocumentOutputElement>();
+            elementIndex++;
 
             using var _ = events.Subscribe(@event =>
             {
@@ -112,11 +125,33 @@ public class NotebookRunner
                         break;
 
                     case CodeSubmissionReceived codeSubmissionReceived:
+                        if (!elementSubmissionMap.TryGetValue(elementIndex, out var codeSet))
+                        {
+                            codeSet = new HashSet<string>();
+                            elementSubmissionMap.Add(elementIndex, codeSet);
+                        }
+
+                        void tryPrintCode(string? kernelName, string code) {
+                            if (!codeSet.Contains(code))
+                            {
+                                printCell(null, kernelName, code, null);
+                                codeSet.Add(code);
+                            }
+                        }
+
+                        if(codeSet.Count > 0 || element.Contents != codeSubmissionReceived.Code) {
+                            tryPrintCode(element.KernelName, element.Contents);
+                            tryPrintCode(element.KernelName + " - import", codeSubmissionReceived.Code);
+                        } else {
+                            tryPrintCode(element.KernelName, element.Contents);
+                        }
+
                         break;
 
                     // output / display events
 
                     case ErrorProduced errorProduced:
+                        printCell(false, element.KernelName, element.Contents, ("error", errorProduced.Message));
                         outputs.Add(CreateErrorOutputElement(errorProduced));
 
                         break;
@@ -136,11 +171,13 @@ public class NotebookRunner
                         break;
 
                     case DisplayedValueProduced displayedValueProduced:
+                        printCell(null, element.KernelName, null, (null, displayedValueProduced.PlainTextValue()));
                         outputs.Add(CreateDisplayOutputElement(displayedValueProduced));
 
                         break;
 
                     case DisplayedValueUpdated displayedValueUpdated:
+                        printCell(null, null, null, (null, displayedValueUpdated.PlainTextValue()));
                         outputs.Add(CreateDisplayOutputElement(displayedValueUpdated));
                         break;
 
@@ -151,6 +188,14 @@ public class NotebookRunner
                             break;
                         }
 
+                        var text = returnValueProduced.PlainTextValue();
+                        if (text.Contains("<style>"))
+                        {
+                            text = text.Replace("\\n", "<br/>");
+                        }
+
+                        printCell(true, null, null, ("return value", text));
+
                         outputs.Add(CreateDisplayOutputElement(returnValueProduced));
                         break;
 
@@ -159,7 +204,7 @@ public class NotebookRunner
                     case CommandFailed failed when failed.Command == command:
                         if (CreateBufferedStandardOutAndErrElement(stdOut, stdErr) is { } te)
                         {
-                            printCommand("Error");
+                            printCell(false, null, null, ("stderr", te.Text));
                             outputs.Add(te);
                         }
 
@@ -171,11 +216,29 @@ public class NotebookRunner
                     case CommandSucceeded succeeded when succeeded.Command == command:
                         if (CreateBufferedStandardOutAndErrElement(stdOut, stdErr) is { } textElement)
                         {
-                            printCommand("Success");
+                            printCell(true, null, null, ("stdout", textElement.Text));
                             outputs.Add(textElement);
                         }
 
                         tcs.SetResult();
+
+                        break;
+
+                    case DiagnosticsProduced diagnostics:
+                        printCell(false, command.TargetKernelName, null, ("diagnostics", diagnostics.FormattedDiagnostics.Select(d => d.Value).Aggregate((a, b) => a + "\n" + b)));
+
+                        break;
+
+                    case PackageAdded package:
+                        printCell(null, command.TargetKernelName, null, (null, $" Package added: {package.PackageReference}"));
+
+                        break;
+
+                    default:
+                        printCell(false, "unhandled", null, ("unhandled", System.Text.Json.JsonSerializer.Serialize(new {
+                            Command = @event.Command,
+                            str = @event.ToString()
+                        })));
 
                         break;
                 }
