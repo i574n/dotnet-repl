@@ -67,21 +67,14 @@ public class NotebookRunner
 
             var startTime = DateTimeOffset.Now;
 
-            var result = _kernel.SendAsync(command, cancellationToken);
-
-            var tcs = new TaskCompletionSource();
-            StringBuilder? stdOut = default;
-            StringBuilder? stdErr = default;
-
-            var outputs = new List<InteractiveDocumentOutputElement>();
-
-
-            void printCell(bool? status, string? kernelName, string? code, (string?, string?)? output) {
+            string elapsedText() {
                 var elapsed = DateTimeOffset.Now - startTime;
-                var elapsedString = elapsed.TotalSeconds < 1
+                return elapsed.TotalSeconds < 1
                     ? $"{elapsed.TotalMilliseconds}ms"
                     : $"{elapsed.TotalSeconds}s";
+            }
 
+            void printCell(bool? status, string? kernelName, string? code, (string?, string?)? output) {
                 Style statusColor = new(status == true ? Color.Green : status == false ? Color.Red : Color.LightSlateGrey);
 
                 AnsiConsole.Console.WriteLine();
@@ -104,7 +97,7 @@ public class NotebookRunner
                     if (outputText?.Trim().Length > 0) {
                         AnsiConsole.Console.Write(
                             new Panel(Markup.Escape(outputText ?? ""))
-                                .Header(status != null ? Markup.Escape($"[ {elapsedString} - {outputHeader} ]") : "")
+                                .Header(status != null ? Markup.Escape($"[ {elapsedText()} - {outputHeader} ]") : "")
                                 .Expand()
                                 .RoundedBorder()
                                 .BorderStyle(statusColor)
@@ -114,6 +107,19 @@ public class NotebookRunner
             }
 
             elementIndex++;
+
+            if (element.Contents.StartsWith("//// ignore")) {
+                printCell(null, $"{element.KernelName} - ignored", element.Contents, null);
+                continue;
+            }
+
+            var result = _kernel.SendAsync(command, cancellationToken);
+
+            var tcs = new TaskCompletionSource();
+            StringBuilder? stdOut = default;
+            StringBuilder? stdErr = default;
+
+            var outputs = new List<InteractiveDocumentOutputElement>();
 
             using var _ = events.Subscribe(@event =>
             {
@@ -143,7 +149,7 @@ public class NotebookRunner
 
                         if(codeSet.Count > 0 || element.Contents != codeSubmissionReceived.Code) {
                             tryPrintCode(element.KernelName, element.Contents);
-                            tryPrintCode(element.KernelName + " - import", codeSubmissionReceived.Code);
+                            tryPrintCode($"{element.KernelName} - import", codeSubmissionReceived.Code);
                         } else {
                             tryPrintCode(element.KernelName, element.Contents);
                         }
@@ -252,6 +258,7 @@ public class NotebookRunner
             resultElement.Metadata ??= new Dictionary<string, object>();
             resultElement.Metadata.Add("dotnet_repl_cellExecutionStartTime", startTime);
             resultElement.Metadata.Add("dotnet_repl_cellExecutionEndTime", DateTimeOffset.Now);
+            resultElement.Metadata.Add("dotnet_repl_cellExecutionTime", elapsedText());
 
             resultDocument.Add(resultElement);
         }
