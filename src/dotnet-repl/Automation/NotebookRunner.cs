@@ -149,7 +149,13 @@ public class NotebookRunner
 
                         if(codeSet.Count > 0 || element.Contents != codeSubmissionReceived.Code) {
                             tryPrintCode(element.KernelName, element.Contents);
-                            tryPrintCode($"{element.KernelName} - import", codeSubmissionReceived.Code);
+                            var codeLimit = 750;
+                            tryPrintCode(
+                                $"{element.KernelName} - import",
+                                codeSubmissionReceived.Code.Length <= codeLimit
+                                    ? codeSubmissionReceived.Code
+                                    : codeSubmissionReceived.Code.Substring(0, codeLimit) + "..."
+                            );
                         } else {
                             tryPrintCode(element.KernelName, element.Contents);
                         }
