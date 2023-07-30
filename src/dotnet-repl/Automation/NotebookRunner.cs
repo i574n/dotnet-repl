@@ -261,10 +261,12 @@ public class NotebookRunner
             await tcs.Task;
 
             var resultElement = new InteractiveDocumentElement(element.Contents, element.KernelName, outputs.ToArray());
+            /*
             resultElement.Metadata ??= new Dictionary<string, object>();
             resultElement.Metadata.Add("dotnet_repl_cellExecutionStartTime", startTime);
             resultElement.Metadata.Add("dotnet_repl_cellExecutionEndTime", DateTimeOffset.Now);
             resultElement.Metadata.Add("dotnet_repl_cellExecutionTime", elapsedText());
+            */
 
             resultDocument.Add(resultElement);
         }
