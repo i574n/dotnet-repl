@@ -74,8 +74,8 @@ public class NotebookRunner
                     : $"{elapsed.TotalSeconds}s";
             }
 
-            void printCell(bool? status, string? kernelName, string? code, (string?, string?)? output) {
-                Style statusColor = new(status == true ? Color.Green : status == false ? Color.Red : Color.LightSlateGrey);
+            void printCell(Color? color, string? kernelName, string? code, (string?, string?)? output) {
+                Style statusColor = new(color ?? Color.LightSlateGrey);
 
                 AnsiConsole.Console.WriteLine();
 
@@ -97,7 +97,7 @@ public class NotebookRunner
                     if (outputText?.Trim().Length > 0) {
                         AnsiConsole.Console.Write(
                             new Panel(Markup.Escape(outputText ?? ""))
-                                .Header(status != null ? Markup.Escape($"[ {elapsedText()} - {outputHeader} ]") : "")
+                                .Header(color != null ? Markup.Escape($"[ {elapsedText()} - {outputHeader} ]") : "")
                                 .Expand()
                                 .RoundedBorder()
                                 .BorderStyle(statusColor)
@@ -165,7 +165,7 @@ public class NotebookRunner
                     // output / display events
 
                     case ErrorProduced errorProduced:
-                        printCell(false, element.KernelName, element.Contents, ("error", errorProduced.Message));
+                        printCell(Color.Red, element.KernelName, element.Contents, ("error", errorProduced.Message));
                         outputs.Add(CreateErrorOutputElement(errorProduced));
 
                         break;
@@ -208,7 +208,7 @@ public class NotebookRunner
                             text = text.Replace("\\n", "<br/>");
                         }
 
-                        printCell(true, null, null, ("return value", text));
+                        printCell(Color.Green, null, null, ("return value", text));
 
                         outputs.Add(CreateDisplayOutputElement(returnValueProduced));
                         break;
@@ -218,7 +218,7 @@ public class NotebookRunner
                     case CommandFailed failed when failed.Command == command:
                         if (CreateBufferedStandardOutAndErrElement(stdOut, stdErr) is { } te)
                         {
-                            printCell(false, null, null, ("stderr", te.Text));
+                            printCell(Color.Red, null, null, ("stderr", te.Text));
                             outputs.Add(te);
                         }
 
@@ -230,7 +230,7 @@ public class NotebookRunner
                     case CommandSucceeded succeeded when succeeded.Command == command:
                         if (CreateBufferedStandardOutAndErrElement(stdOut, stdErr) is { } textElement)
                         {
-                            printCell(true, null, null, ("stdout", textElement.Text));
+                            printCell(Color.Green, null, null, ("stdout", textElement.Text));
                             outputs.Add(textElement);
                         }
 
@@ -239,7 +239,13 @@ public class NotebookRunner
                         break;
 
                     case DiagnosticsProduced diagnostics:
-                        printCell(false, command.TargetKernelName, null, ("diagnostics", diagnostics.FormattedDiagnostics.Select(d => d.Value).Aggregate((a, b) => a + "\n" + b)));
+                        printCell(Color.Yellow, command.TargetKernelName, null, (
+                            "diagnostics",
+                            diagnostics.FormattedDiagnostics
+                                .Select(d => d.Value)
+                                .Where(d => !d.Contains("[<EntryPoint>]"))
+                                .Aggregate((a, b) => a + "\n" + b)
+                        ));
 
                         break;
 
@@ -249,7 +255,7 @@ public class NotebookRunner
                         break;
 
                     default:
-                        printCell(false, "unhandled", null, ("unhandled", System.Text.Json.JsonSerializer.Serialize(new {
+                        printCell(Color.Red, "unhandled", null, ("unhandled", System.Text.Json.JsonSerializer.Serialize(new {
                             Command = @event.Command,
                             str = @event.ToString()
                         })));
