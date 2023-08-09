@@ -72,10 +72,11 @@ public class NotebookRunner
             var startTime = DateTimeOffset.Now;
 
             string elapsedText() {
-                var elapsed = DateTimeOffset.Now - startTime;
-                return elapsed.TotalSeconds < 1
-                    ? $"{elapsed.TotalMilliseconds}ms"
-                    : $"{elapsed.TotalSeconds}s";
+                return (DateTimeOffset.Now - startTime) switch {
+                    var t when t.TotalSeconds < 1 => $"{t.TotalMilliseconds}ms",
+                    var t when t.TotalMinutes < 1 => $"{t.TotalSeconds}s",
+                    var t => $"{t.TotalMinutes}m"
+                };
             }
 
             void printCell(Color? color, string? kernelName, string? code, (string?, string?)? output) {
