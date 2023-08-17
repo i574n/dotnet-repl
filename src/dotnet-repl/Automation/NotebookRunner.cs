@@ -59,10 +59,6 @@ public class NotebookRunner
 
         foreach (var element in notebook.Elements)
         {
-            if (element.KernelName == "fsharp") {
-                element.Contents = element.Contents.Replace("[<EntryPoint>]", "");
-            }
-
             var command = new SubmitCode(element.Contents, element.KernelName);
 
             var events = _kernel.KernelEvents.Replay();
