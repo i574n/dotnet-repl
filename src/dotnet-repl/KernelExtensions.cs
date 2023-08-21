@@ -145,7 +145,7 @@ internal static class KernelExtensions
                 table.AddRow(values.Select(v => v is null ? "" : Markup.Escape(v.ToDisplayString())).ToArray());
             }
 
-            table.FormatTo(context);
+            table.FormatTo(context, "text/plain");
 
             return true;
         });
