@@ -5,6 +5,7 @@ using Microsoft.DotNet.Interactive.Browser;
 using Microsoft.DotNet.Interactive.Commands;
 using Microsoft.DotNet.Interactive.CSharp;
 using Microsoft.DotNet.Interactive.FSharp;
+using Microsoft.DotNet.Interactive.Spiral;
 using Microsoft.DotNet.Interactive.HttpRequest;
 using Microsoft.DotNet.Interactive.PowerShell;
 using Pocket;
@@ -67,6 +68,10 @@ public static class KernelBuilder
                 .UseWho()
                 .UseValueSharing(),
             new[] { "f#", "F#" });
+
+        compositeKernel.Add(
+            new SpiralKernel(),
+            new[] { "spiral", "Spiral" });
 
         compositeKernel.Add(
             new PowerShellKernel()

@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.DotNet.Interactive.CSharp;
 using Microsoft.DotNet.Interactive.FSharp;
+using Microsoft.DotNet.Interactive.Spiral;
 using dotnet_repl;
 using Xunit.Abstractions;
 
@@ -17,6 +18,7 @@ namespace Pocket
                     typeof(Program).Assembly,
                     typeof(CSharpKernel).Assembly,
                     typeof(FSharpKernel).Assembly,
+                    typeof(SpiralKernel).Assembly,
                 });
     }
 }
