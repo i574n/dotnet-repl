@@ -69,9 +69,9 @@ public class NotebookRunner
 
             string elapsedText() {
                 return (DateTimeOffset.Now - startTime) switch {
-                    var t when t.TotalSeconds < 1 => $"{t.TotalMilliseconds}ms",
-                    var t when t.TotalMinutes < 1 => $"{t.TotalSeconds}s",
-                    var t => $"{t.TotalMinutes}m"
+                    var t when t.TotalSeconds < 1 => $"{t.TotalMilliseconds:F2}ms",
+                    var t when t.TotalMinutes < 1 => $"{t.TotalSeconds:F2}s",
+                    var t => $"{t.TotalMinutes:F2}m"
                 };
             }
 
