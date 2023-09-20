@@ -285,7 +285,7 @@ public class NotebookRunner
                            notebook.GetDefaultKernelName() ??
                            "C#";
 
-        resultDocument.WithJupyterMetadata(languageName);
+        // resultDocument.WithJupyterMetadata(languageName);
 
         return resultDocument;
     }
