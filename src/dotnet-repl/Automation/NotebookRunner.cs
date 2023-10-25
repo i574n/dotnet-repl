@@ -54,6 +54,8 @@ public class NotebookRunner
             }
         }
 
+        var lengthLimit = 750;
+
         var elementSubmissionMap = new Dictionary<int, HashSet<string>>();
         var elementIndex = -1;
 
@@ -67,15 +69,15 @@ public class NotebookRunner
 
             var startTime = DateTimeOffset.Now;
 
-            string elapsedText() {
-                return (DateTimeOffset.Now - startTime) switch {
-                    var t when t.TotalSeconds < 1 => $"{t.TotalMilliseconds:F2}ms",
-                    var t when t.TotalMinutes < 1 => $"{t.TotalSeconds:F2}s",
-                    var t => $"{t.TotalMinutes:F2}m"
-                };
-            }
+            string elapsedText() => (DateTimeOffset.Now - startTime) switch
+            {
+                var t when t.TotalSeconds < 1 => $"{t.TotalMilliseconds:F2}ms",
+                var t when t.TotalMinutes < 1 => $"{t.TotalSeconds:F2}s",
+                var t => $"{t.TotalMinutes:F2}m"
+            };
 
-            void printCell(Color? color, string? kernelName, string? code, (string?, string?)? output) {
+            void printCell(Color? color, string? kernelName, string? code, (string?, string?)? output)
+            {
                 Style statusColor = new(color ?? Color.LightSlateGrey);
 
                 AnsiConsole.Console.WriteLine();
@@ -88,14 +90,17 @@ public class NotebookRunner
                     AnsiConsole.Console.Write(rule);
                 }
 
-                if (code != null) {
+                if (code != null)
+                {
                     AnsiConsole.Console.Write(new Text(Markup.Escape(code)));
                     AnsiConsole.Console.WriteLine();
                 }
 
-                if (output.HasValue) {
+                if (output.HasValue)
+                {
                     (string? outputHeader, string? outputText) = output.Value;
-                    if (outputText?.Trim().Length > 0) {
+                    if (outputText?.Trim().Length > 0)
+                    {
                         AnsiConsole.Console.Write(
                             new Panel(Markup.Escape(outputText ?? ""))
                                 .Header(color != null ? Markup.Escape($"[ {elapsedText()} - {outputHeader} ]") : "")
@@ -109,7 +114,8 @@ public class NotebookRunner
 
             elementIndex++;
 
-            if (element.Contents.StartsWith("//// ignore")) {
+            if (element.Contents.StartsWith("//// ignore") || element.Contents.StartsWith("// // ignore"))
+            {
                 printCell(null, $"{element.KernelName} - ignored", element.Contents, null);
                 continue;
             }
@@ -136,11 +142,12 @@ public class NotebookRunner
                     case CodeSubmissionReceived codeSubmissionReceived:
                         if (!elementSubmissionMap.TryGetValue(elementIndex, out var codeSet))
                         {
-                            codeSet = new HashSet<string>();
+                            codeSet = [];
                             elementSubmissionMap.Add(elementIndex, codeSet);
                         }
 
-                        void tryPrintCode(string? kernelName, string code) {
+                        void tryPrintCode(string? kernelName, string code)
+                        {
                             if (!codeSet.Contains(code))
                             {
                                 printCell(null, kernelName, code, null);
@@ -148,16 +155,18 @@ public class NotebookRunner
                             }
                         }
 
-                        if(codeSet.Count > 0 || element.Contents != codeSubmissionReceived.Code) {
+                        if (codeSet.Count > 0 || element.Contents != codeSubmissionReceived.Code)
+                        {
                             tryPrintCode(element.KernelName, element.Contents);
-                            var codeLimit = 750;
                             tryPrintCode(
                                 $"{element.KernelName} - import",
-                                codeSubmissionReceived.Code.Length <= codeLimit
+                                codeSubmissionReceived.Code.Length <= lengthLimit
                                     ? codeSubmissionReceived.Code
-                                    : codeSubmissionReceived.Code.Substring(0, codeLimit) + "..."
+                                    : codeSubmissionReceived.Code.Substring(0, lengthLimit) + "..."
                             );
-                        } else {
+                        }
+                        else
+                        {
                             tryPrintCode(element.KernelName, element.Contents);
                         }
 
@@ -192,7 +201,7 @@ public class NotebookRunner
                         break;
 
                     case DisplayedValueUpdated displayedValueUpdated:
-                        printCell(null, null, null, (null, displayedValueUpdated.PlainTextValue()));
+                        printCell(null, null, null, (null, displayedValueUpdated.PlainTextValue())!);
                         outputs.Add(CreateDisplayOutputElement(displayedValueUpdated));
                         break;
 
@@ -209,7 +218,15 @@ public class NotebookRunner
                             text = text.Replace("\\n", "<br/>");
                         }
 
-                        printCell(Color.Green, null, null, ("return value", text));
+                        printCell(
+                            Color.Green,
+                            null,
+                            null,
+                            ("return value",
+                            text.Length <= lengthLimit
+                                ? text
+                                : text.Substring(0, lengthLimit) + "...")
+                        );
 
                         outputs.Add(CreateDisplayOutputElement(returnValueProduced));
                         break;
@@ -250,15 +267,22 @@ public class NotebookRunner
                         break;
 
                     case PackageAdded package:
-                        printCell(null, command.TargetKernelName, null, (null, $" Package added: {package.PackageReference}"));
+                        printCell(null, command.TargetKernelName, null, (null, $" Package added: {package.PackageReference}")!);
 
                         break;
 
                     default:
-                        printCell(Color.Red, "unhandled", null, ("unhandled", System.Text.Json.JsonSerializer.Serialize(new {
-                            Command = @event.Command,
-                            str = @event.ToString()
-                        })));
+                        printCell(
+                            Color.Red,
+                            "unhandled",
+                            null,
+                            ("unhandled",
+                            System.Text.Json.JsonSerializer.Serialize(new
+                            {
+                                Command = @event.Command,
+                                str = @event.ToString()
+                            }))
+                        );
 
                         break;
                 }
