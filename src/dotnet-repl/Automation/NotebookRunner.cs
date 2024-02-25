@@ -243,6 +243,13 @@ public class NotebookRunner
                         outputs.Add(CreateErrorOutputElement(failed));
                         tcs.SetResult();
 
+                        new Thread(() =>
+                        {
+                            Thread.Sleep(2000);
+                            AnsiConsole.Console.WriteLine("Exiting...");
+                            System.Diagnostics.Process.GetCurrentProcess().Kill();
+                        }).Start();
+
                         break;
 
                     case CommandSucceeded succeeded when succeeded.Command == command:
