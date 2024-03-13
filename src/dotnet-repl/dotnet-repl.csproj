@@ -36,15 +36,15 @@
     <ProjectReference Include="../../../dotnet-interactive/src/Microsoft.DotNet.Interactive.PackageManagement/Microsoft.DotNet.Interactive.PackageManagement.csproj" />
     <ProjectReference Include="../../../dotnet-interactive/src/Microsoft.DotNet.Interactive.PowerShell/Microsoft.DotNet.Interactive.PowerShell.csproj" />
 
-    <PackageReference Include="radline" Version="0.6.0" />
+    <PackageReference Include="radline" Version="0.7.0" />
     <PackageReference Include="Serilog.Sinks.RollingFileAlternate" Version="2.0.9" />
-    <PackageReference Include="Spectre.Console" Version="0.47.1-preview.0.4" />
+    <PackageReference Include="Spectre.Console" Version="0.48.1-preview.0.35" />
     <PackageReference Include="trexlib" Version="1.0.188" />
     <PackageReference Include="pocket.disposable" Version="1.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="PocketLogger" Version="0.8.1">
+    <PackageReference Include="PocketLogger" Version="0.8.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
