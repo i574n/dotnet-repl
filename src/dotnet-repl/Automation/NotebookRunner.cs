@@ -245,8 +245,8 @@ public class NotebookRunner
 
                         new Thread(() =>
                         {
-                            Thread.Sleep(2000);
                             AnsiConsole.Console.WriteLine("Exiting...");
+                            Thread.Sleep(2000);
                             System.Diagnostics.Process.GetCurrentProcess().Kill();
                         }).Start();
 

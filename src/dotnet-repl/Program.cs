@@ -14,8 +14,18 @@ namespace dotnet_repl;
 
 public class Program
 {
+    protected static void CancelHandler(object? sender, ConsoleCancelEventArgs args)
+    {
+        args.Cancel = true;
+        Console.WriteLine("Cancelling...");
+        System.Threading.Thread.Sleep(500);
+        System.Diagnostics.Process.GetCurrentProcess().Kill();
+    }
+
     public static async Task<int> Main(string[] args)
     {
+        Console.CancelKeyPress += new ConsoleCancelEventHandler(CancelHandler);
+
         Console.OutputEncoding = Encoding.UTF8;
 
         var parser = CommandLineParser.Create();
