@@ -38,6 +38,7 @@ public abstract class KernelSpecificTheme : Theme
         "javascript" => new JavaScriptTheme(),
         "sql" => new SqlTheme(),
         "html" => new HtmlTheme(),
+        "mermaid" => new HtmlTheme(),
         "http" => new HttpRequestTheme(),
         _ => null
     };

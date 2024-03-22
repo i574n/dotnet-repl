@@ -33,6 +33,7 @@ public static class CommandLineParser
             "fsharp",
             "pwsh",
             "javascript",
+            "mermaid",
             "html");
 
     public static Option<FileInfo> RunOption = new Option<FileInfo>(

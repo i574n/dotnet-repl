@@ -91,10 +91,11 @@ public static class KernelBuilder
             var jsKernel = await playwrightConnector.CreateKernelAsync("javascript", BrowserKernelLanguage.JavaScript);
             return (htmlKernel, jsKernel);
         }).Result;
-        
+
         compositeKernel.Add(jsKernel, new[] { "js" });
         compositeKernel.Add(htmlKernel);
         compositeKernel.Add(new MarkdownKernel());
+        compositeKernel.Add(new Microsoft.DotNet.Interactive.Mermaid.MermaidKernel());
         compositeKernel.Add(new SqlDiscoverabilityKernel());
         compositeKernel.Add(new KqlDiscoverabilityKernel());
 

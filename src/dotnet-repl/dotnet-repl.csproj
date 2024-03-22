@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../../dotnet-interactive/src/Microsoft.DotNet.Interactive/Microsoft.DotNet.Interactive.csproj" />
+    <ProjectReference Include="../../../dotnet-interactive/src/Microsoft.DotNet.Interactive.Mermaid/Microsoft.DotNet.Interactive.Mermaid.csproj" />
     <ProjectReference Include="../../../dotnet-interactive/src/Microsoft.DotNet.Interactive.CSharp/Microsoft.DotNet.Interactive.CSharp.csproj" />
     <ProjectReference Include="../../../dotnet-interactive/src/Microsoft.DotNet.Interactive.Documents/Microsoft.DotNet.Interactive.Documents.csproj" />
     <ProjectReference Include="../../../dotnet-interactive/src/Microsoft.DotNet.Interactive.FSharp/Microsoft.DotNet.Interactive.FSharp.fsproj" />
