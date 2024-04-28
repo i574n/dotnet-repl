@@ -51,7 +51,7 @@ public class Repl : IDisposable
         QuitAction = quit;
         AnsiConsole = ansiConsole;
         InputSource = inputSource;
-        Theme = KernelSpecificTheme.GetTheme(kernel.DefaultKernelName) ?? new CSharpTheme();
+        Theme = KernelSpecificTheme.GetTheme(kernel.DefaultKernelName) ?? new SpiralTheme();
 
         _disposables.Add(() => _disposalTokenSource.Cancel());
 

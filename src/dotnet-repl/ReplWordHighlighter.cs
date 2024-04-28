@@ -25,7 +25,9 @@ internal static class ReplWordHighlighter
             wordHighlighter.AddWords(csharpOnlyWordsToHighlight);
         else if (languageName is "fsharp")
             wordHighlighter.AddWords(fsharpOnlyWordsToHighlight);
-            
+        else if (languageName is "spiral")
+            wordHighlighter.AddWords(fsharpOnlyWordsToHighlight);
+
         // Since it also supports powershell, more keywords might be added by adding a case for "pwsh"
 
         return wordHighlighter;

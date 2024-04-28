@@ -70,7 +70,8 @@ public static class KernelBuilder
             new[] { "f#", "F#" });
 
         compositeKernel.Add(
-            new SpiralKernel(),
+            new SpiralKernel()
+                .UseKernelHelpers(),
             new[] { "spiral", "Spiral" });
 
         compositeKernel.Add(
@@ -109,7 +110,7 @@ public static class KernelBuilder
         HttpKernelExtension.Load(compositeKernel);
 
         compositeKernel.DefaultKernelName = options.DefaultKernelName;
-        if (compositeKernel.DefaultKernelName == "fsharp")
+        if (compositeKernel.DefaultKernelName is "fsharp" or "spiral")
         {
             var fsharpKernel = compositeKernel.FindKernelByName("fsharp");
 

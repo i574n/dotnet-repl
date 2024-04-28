@@ -27,10 +27,11 @@ public static class CommandLineParser
     public static Option<string> DefaultKernelOption = new Option<string>(
             "--default-kernel",
             description: "The default language for the kernel",
-            getDefaultValue: () => Environment.GetEnvironmentVariable("DOTNET_REPL_DEFAULT_KERNEL") ?? "csharp")
+            getDefaultValue: () => Environment.GetEnvironmentVariable("DOTNET_REPL_DEFAULT_KERNEL") ?? "spiral")
         .FromAmong(
             "csharp",
             "fsharp",
+            "spiral",
             "pwsh",
             "javascript",
             "mermaid",
@@ -189,7 +190,7 @@ public static class CommandLineParser
         if (isTerminal)
         {
             var theme = KernelSpecificTheme.GetTheme(options.DefaultKernelName);
-            ansiConsole.RenderSplash(theme ?? new CSharpTheme());
+            ansiConsole.RenderSplash(theme ?? new SpiralTheme());
         }
 
         var kernel = KernelBuilder.CreateKernel(options);

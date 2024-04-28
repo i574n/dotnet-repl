@@ -34,6 +34,7 @@ public abstract class KernelSpecificTheme : Theme
     {
         "csharp" => new CSharpTheme(),
         "fsharp" => new FSharpTheme(),
+        "spiral" => new SpiralTheme(),
         "pwsh" => new PowerShellTheme(),
         "javascript" => new JavaScriptTheme(),
         "sql" => new SqlTheme(),
@@ -56,6 +57,13 @@ public class FSharpTheme : KernelSpecificTheme
     public override Style AccentStyle => new(Color.Magenta1);
 
     public override string PromptText => "F#";
+}
+
+public class SpiralTheme : KernelSpecificTheme
+{
+    public override Style AccentStyle => new(Color.DarkSlateGray3);
+
+    public override string PromptText => "Spiral";
 }
 
 public class PowerShellTheme : KernelSpecificTheme

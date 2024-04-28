@@ -6,7 +6,7 @@ namespace dotnet_repl;
 public class StartupOptions
 {
     public StartupOptions(
-        string defaultKernel = "csharp",
+        string defaultKernel = "spiral",
         DirectoryInfo? workingDir = null,
         FileInfo? fileToRun = null,
         DirectoryInfo? logPath = null,

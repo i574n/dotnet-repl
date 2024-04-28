@@ -162,7 +162,7 @@ public class NotebookRunner
                                 $"{element.KernelName} - import",
                                 codeSubmissionReceived.Code.Length <= lengthLimit
                                     ? codeSubmissionReceived.Code
-                                    : codeSubmissionReceived.Code.Substring(0, lengthLimit) + "..."
+                                    : codeSubmissionReceived.Code[..lengthLimit] + "..."
                             );
                         }
                         else
@@ -225,7 +225,7 @@ public class NotebookRunner
                             ("return value",
                             text.Length <= lengthLimit
                                 ? text
-                                : text.Substring(0, lengthLimit) + "...")
+                                : text[..lengthLimit] + "...")
                         );
 
                         outputs.Add(CreateDisplayOutputElement(returnValueProduced));
@@ -246,7 +246,7 @@ public class NotebookRunner
                         new Thread(() =>
                         {
                             AnsiConsole.Console.WriteLine("Exiting...");
-                            Thread.Sleep(2000);
+                            Thread.Sleep(1000);
                             System.Diagnostics.Process.GetCurrentProcess().Kill();
                         }).Start();
 
@@ -314,7 +314,7 @@ public class NotebookRunner
 
         var languageName = defaultKernel?.KernelInfo.LanguageName ??
                            notebook.GetDefaultKernelName() ??
-                           "C#";
+                           "Spiral";
 
         // resultDocument.WithJupyterMetadata(languageName);
 
