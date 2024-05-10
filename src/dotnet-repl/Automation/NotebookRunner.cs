@@ -114,7 +114,7 @@ public class NotebookRunner
 
             elementIndex++;
 
-            if (element.Contents.StartsWith("//// ignore") || element.Contents.StartsWith("// // ignore"))
+            if (element.Contents.StartsWith("//// ignore"))
             {
                 printCell(null, $"{element.KernelName} - ignored", element.Contents, null);
                 continue;
@@ -215,7 +215,7 @@ public class NotebookRunner
                         var text = returnValueProduced.PlainTextValue();
                         if (text.Contains("<style>"))
                         {
-                            text = text.Replace("\\n", "<br/>");
+                            text = text.Replace("\\n", "<br />");
                         }
 
                         printCell(
