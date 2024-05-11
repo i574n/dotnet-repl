@@ -54,7 +54,7 @@ public class NotebookRunner
             }
         }
 
-        var lengthLimit = 750;
+        var lengthLimit = 1500;
 
         var elementSubmissionMap = new Dictionary<int, HashSet<string>>();
         var elementIndex = -1;
@@ -246,7 +246,7 @@ public class NotebookRunner
                         new Thread(() =>
                         {
                             AnsiConsole.Console.WriteLine("Exiting...");
-                            Thread.Sleep(1000);
+                            Thread.Sleep(2000);
                             System.Diagnostics.Process.GetCurrentProcess().Kill();
                         }).Start();
 
