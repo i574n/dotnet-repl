@@ -54,7 +54,31 @@ public class NotebookRunner
             }
         }
 
-        var lengthLimit = 1500;
+        var lengthLimit = 3000;
+
+        // string ellipsis(string text, int lengthLimit) =>
+        //     text.Length <= lengthLimit
+        //         ? text
+        //         : text[..lengthLimit] + "..."; ;
+
+        string ellipsisEnd(string s, int max)
+        {
+            var len = s.Length;
+            if (len <= max)
+            {
+                return s;
+            }
+            else
+            {
+                var half = (double)max / 2;
+                var startHalf = (int)Math.Ceiling(half);
+                var endHalf = (int)Math.Floor(half);
+                var start = s[..(startHalf - 1)];
+                var end = s[(len - endHalf)..];
+                return $"{start}...{end}";
+            }
+        }
+
 
         var elementSubmissionMap = new Dictionary<int, HashSet<string>>();
         var elementIndex = -1;
@@ -160,9 +184,7 @@ public class NotebookRunner
                             tryPrintCode(element.KernelName, element.Contents);
                             tryPrintCode(
                                 $"{element.KernelName} - import",
-                                codeSubmissionReceived.Code.Length <= lengthLimit
-                                    ? codeSubmissionReceived.Code
-                                    : codeSubmissionReceived.Code[..lengthLimit] + "..."
+                                ellipsisEnd(codeSubmissionReceived.Code, lengthLimit)
                             );
                         }
                         else
@@ -222,10 +244,7 @@ public class NotebookRunner
                             Color.Green,
                             null,
                             null,
-                            ("return value",
-                            text.Length <= lengthLimit
-                                ? text
-                                : text[..lengthLimit] + "...")
+                            ("return value", ellipsisEnd(text, lengthLimit))
                         );
 
                         outputs.Add(CreateDisplayOutputElement(returnValueProduced));
