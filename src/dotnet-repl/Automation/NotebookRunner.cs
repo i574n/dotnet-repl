@@ -181,11 +181,11 @@ public class NotebookRunner
 
                         if (codeSet.Count > 0 || element.Contents != codeSubmissionReceived.Code)
                         {
-                            tryPrintCode(element.KernelName, element.Contents);
-                            tryPrintCode(
-                                $"{element.KernelName} - import",
-                                ellipsisEnd(codeSubmissionReceived.Code, lengthLimit)
-                            );
+                            // tryPrintCode(element.KernelName, element.Contents);
+                            // tryPrintCode(
+                            //     $"{element.KernelName} - import",
+                            //     ellipsisEnd(codeSubmissionReceived.Code, lengthLimit)
+                            // );
                         }
                         else
                         {
