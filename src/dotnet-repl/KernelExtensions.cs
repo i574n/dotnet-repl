@@ -10,6 +10,7 @@ using Microsoft.DotNet.Interactive.CSharp;
 using Microsoft.DotNet.Interactive.Formatting;
 using Microsoft.DotNet.Interactive.FSharp;
 using Microsoft.DotNet.Interactive.PackageManagement;
+using Microsoft.DotNet.Interactive.Directives;
 using Recipes;
 using Spectre.Console;
 
@@ -20,12 +21,14 @@ internal static class KernelExtensions
     public static T UseAboutMagicCommand<T>(this T kernel)
         where T : Kernel
     {
-        var about = new Command("#!about", "Show version and build information");
-
-        about.SetHandler(context => context.Display(VersionSensor.Version()),
-                         Bind.FromServiceProvider<KernelInvocationContext>());
-
-        kernel.AddDirective(about);
+        kernel.AddDirective(new KernelActionDirective("#!about")
+        {
+            Description = "Show version and build information"
+        }, (command, context) =>
+        {
+            context.Display(VersionSensor.Version());
+            return Task.CompletedTask;
+        });
 
         Formatter.Register<VersionSensor.BuildInfo>((info, context) =>
         {
@@ -47,31 +50,24 @@ internal static class KernelExtensions
     public static TKernel UseDebugMagicCommand<TKernel>(this TKernel kernel)
         where TKernel : Kernel
     {
-        var debug = new Command("#!debug");
+        kernel.AddDirective(new KernelActionDirective("#!debug"), async (command, context) =>
+        {
+            await Attach();
 
-        debug.SetHandler(async (context, console, cancellationToken) =>
-                         {
-                             await Attach();
+            async Task Attach()
+            {
+                var process = Process.GetCurrentProcess();
 
-                             async Task Attach()
-                             {
-                                 var process = Process.GetCurrentProcess();
+                var processId = process.Id;
 
-                                 var processId = process.Id;
+                context.Display($"Attach your debugger to process {processId} ({process.ProcessName}).");
 
-                                 context.Display($"Attach your debugger to process {processId} ({process.ProcessName}).");
-
-                                 while (!Debugger.IsAttached)
-                                 {
-                                     await Task.Delay(500, cancellationToken);
-                                 }
-                             }
-                         },
-                         Bind.FromServiceProvider<KernelInvocationContext>(),
-                         Bind.FromServiceProvider<IConsole>(),
-                         Bind.FromServiceProvider<CancellationToken>());
-
-        kernel.AddDirective(debug);
+                while (!Debugger.IsAttached)
+                {
+                    await Task.Delay(500);
+                }
+            }
+        });
 
         return kernel;
     }
@@ -79,9 +75,10 @@ internal static class KernelExtensions
     public static T UseHelpMagicCommand<T>(this T kernel)
         where T : Kernel
     {
-        var help = new Command("#!help", "Show help for the REPL");
-
-        help.SetHandler(() =>
+        kernel.AddDirective(new KernelActionDirective("#!help")
+        {
+            Description = "Show help for the REPL"
+        }, (command, context) =>
         {
             var console = AnsiConsole.Console;
 
@@ -95,11 +92,8 @@ internal static class KernelExtensions
             grid.ShowMagics(kernel);
 
             console.Announce(grid);
+            return Task.CompletedTask;
         });
-
-        help.AddAlias("#help");
-
-        kernel.AddDirective(help);
 
         return kernel;
     }

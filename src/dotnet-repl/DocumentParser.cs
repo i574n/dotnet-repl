@@ -22,18 +22,11 @@ public static class DocumentParser
     {
         KernelInfoCollection kernelInfos = new();
 
-        var kernelChoosers = kernel.Directives.OfType<ChooseKernelDirective>();
+        var kernelChoosers = kernel.KernelInfo.SupportedDirectives;
 
         foreach (var kernelChooser in kernelChoosers)
         {
-            List<string> kernelAliases = new();
-
-            foreach (var alias in kernelChooser.Aliases.Where(a => a != kernelChooser.Name))
-            {
-                kernelAliases.Add(alias[2..]);
-            }
-
-            kernelInfos.Add(new KernelInfo(kernelChooser.Name[2..], aliases: kernelAliases));
+            kernelInfos.Add(new KernelInfo(kernelChooser.Name[2..]));
         }
 
         return kernelInfos;
