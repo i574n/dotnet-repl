@@ -9,6 +9,7 @@ using Microsoft.DotNet.Interactive;
 using Microsoft.DotNet.Interactive.CSharp;
 using Microsoft.DotNet.Interactive.Formatting;
 using Microsoft.DotNet.Interactive.FSharp;
+using Microsoft.DotNet.Interactive.Spiral;
 using Microsoft.DotNet.Interactive.PackageManagement;
 using Microsoft.DotNet.Interactive.Directives;
 using Recipes;
@@ -111,6 +112,24 @@ internal static class KernelExtensions
     }
 
     public static FSharpKernel UseNugetDirective(this FSharpKernel kernel, bool forceRestore = false)
+    {
+        kernel.UseNugetDirective((k, resolvedPackageReference) =>
+        {
+            var resolvedAssemblies = resolvedPackageReference
+                .SelectMany(r => r.AssemblyPaths);
+
+            var packageRoots = resolvedPackageReference
+                .Select(r => r.PackageRoot);
+
+            k.AddAssemblyReferencesAndPackageRoots(resolvedAssemblies, packageRoots);
+
+            return Task.CompletedTask;
+        }, forceRestore);
+
+        return kernel;
+    }
+
+    public static SpiralKernel UseNugetDirective(this SpiralKernel kernel, bool forceRestore = false)
     {
         kernel.UseNugetDirective((k, resolvedPackageReference) =>
         {

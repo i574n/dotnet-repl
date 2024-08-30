@@ -71,6 +71,7 @@ public static class KernelBuilder
 
         compositeKernel.Add(
             new SpiralKernel()
+                .UseNugetDirective()
                 .UseKernelHelpers(),
             new[] { "spiral", "Spiral" });
 
