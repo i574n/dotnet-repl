@@ -153,7 +153,7 @@ public static class CommandLineParser
 
                 var console = ansiConsole ?? AnsiConsole.Console;
 
-                var inputFields = doc.GetInputFields();
+                var inputFields = doc.GetInputFields((x) => null);
 
                 if (inputFields.Any())
                 {

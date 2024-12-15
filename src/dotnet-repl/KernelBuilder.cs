@@ -98,8 +98,8 @@ public static class KernelBuilder
         compositeKernel.Add(htmlKernel);
         compositeKernel.Add(new MarkdownKernel());
         compositeKernel.Add(new Microsoft.DotNet.Interactive.Mermaid.MermaidKernel());
-        compositeKernel.Add(new SqlDiscoverabilityKernel());
-        compositeKernel.Add(new KqlDiscoverabilityKernel());
+        // compositeKernel.Add(new SqlDiscoverabilityKernel());
+        // compositeKernel.Add(new KqlDiscoverabilityKernel());
 
         var inputKernel = new InputKernel();
 
