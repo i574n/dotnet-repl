@@ -125,13 +125,17 @@ public class NotebookRunner
                     (string? outputHeader, string? outputText) = output.Value;
                     if (outputText?.Trim().Length > 0)
                     {
-                        AnsiConsole.Console.Write(
-                            new Panel(Markup.Escape(outputText ?? ""))
-                                .Header(color != null ? Markup.Escape($"[ {elapsedText()} - {outputHeader} ]") : "")
-                                .Expand()
-                                .RoundedBorder()
-                                .BorderStyle(statusColor)
+                        var rule = new Rule(
+                            color != null ? Markup.Escape($"[ {elapsedText()} - {outputHeader} ]") : ""
                         );
+                        rule.LeftJustified();
+                        rule.RuleStyle(statusColor);
+                        AnsiConsole.Console.Write(rule);
+
+                        var prefixColor = statusColor.Foreground.Blend(Color.Silver, 0.2f);
+                        var prefix = $"\x1B[38;2;{prefixColor.R};{prefixColor.G};{prefixColor.B}m│\x1B[0m ";
+                        var text = $"{prefix}{outputText}".Replace("\n", $"\n{prefix}");
+                        AnsiConsole.Console.WriteLine(text);
                     }
                 }
             }
@@ -270,6 +274,7 @@ public class NotebookRunner
                             System.Console.Out.Flush();
                             Thread.Sleep(60);
                             AnsiConsole.Console.WriteLine("NotebookRunner.RunNotebookAsync / exiting... 1");
+                            AnsiConsole.Console.WriteLine($"NotebookRunner.RunNotebookAsync / event: {@event}");
                             System.Diagnostics.Process.GetCurrentProcess().Kill();
                         }).Start();
 

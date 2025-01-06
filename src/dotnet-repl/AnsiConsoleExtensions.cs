@@ -32,20 +32,6 @@ internal static class AnsiConsoleExtensions
                 .Expand());
     }
 
-    public static void RenderSplash(
-        this IAnsiConsole ansiConsole,
-        KernelSpecificTheme theme)
-    {
-        ansiConsole.Write(
-            new FigletText($".NET REPL: {theme.KernelDisplayName}")
-                .Centered()
-                .Color(theme.AccentStyle.Foreground));
-
-        ansiConsole.Write(
-            new Markup(".NET Interactive 💓 Spectre.Console\n\n", theme.AnnouncementTextStyle)
-                .Centered());
-    }
-
     public static IRenderable GetErrorDisplay(
         DisplayEvent @event,
         KernelSpecificTheme theme,
@@ -55,7 +41,7 @@ internal static class AnsiConsoleExtensions
             .Expand()
             .RoundedBorder()
             .BorderStyle(theme.ErrorOutputBorderStyle);
-        
+
     public static IRenderable GetErrorDisplay(
         CommandFailed failed,
         KernelSpecificTheme theme,

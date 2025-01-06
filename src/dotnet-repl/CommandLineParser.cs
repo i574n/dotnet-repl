@@ -153,7 +153,7 @@ public static class CommandLineParser
 
                 var console = ansiConsole ?? AnsiConsole.Console;
 
-                var inputFields = doc.GetInputFields((x) => null);
+                var inputFields = doc.GetInputFields((x) => new DirectiveParseResult());
 
                 if (inputFields.Any())
                 {
@@ -186,12 +186,6 @@ public static class CommandLineParser
         var disposables = new CompositeDisposable();
 
         var isTerminal = ansiConsole.Profile.Out.IsTerminal;
-
-        if (isTerminal)
-        {
-            var theme = KernelSpecificTheme.GetTheme(options.DefaultKernelName);
-            ansiConsole.RenderSplash(theme ?? new SpiralTheme());
-        }
 
         var kernel = KernelBuilder.CreateKernel(options);
 
