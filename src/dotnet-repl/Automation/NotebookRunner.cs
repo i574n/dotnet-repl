@@ -125,12 +125,12 @@ public class NotebookRunner
                     (string? outputHeader, string? outputText) = output.Value;
                     if (outputText?.Trim().Length > 0)
                     {
-                        var rule = new Rule(
-                            color != null ? Markup.Escape($"[ {elapsedText()} - {outputHeader} ]") : ""
-                        );
-                        rule.LeftJustified();
-                        rule.RuleStyle(statusColor);
-                        AnsiConsole.Console.Write(rule);
+                        if (color != null) {
+                            var rule = new Rule(Markup.Escape($"[ {elapsedText()} - {outputHeader} ]"));
+                            rule.LeftJustified();
+                            rule.RuleStyle(statusColor);
+                            AnsiConsole.Console.Write(rule);
+                        }
 
                         var prefixColor = statusColor.Foreground.Blend(Color.Silver, 0.2f);
                         var prefix = $"\x1B[38;2;{prefixColor.R};{prefixColor.G};{prefixColor.B}m│\x1B[0m ";
