@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -13,13 +13,14 @@ internal static class InteractiveDocumentExtensions
         this InteractiveDocument document,
         string language = "Spiral")
     {
+        // FIX: (WithJupyterMetadata) update to match .NET Interactive implementation
         var (kernelName, canonicalLanguageName, langVersion, fileExtension) =
             language.ToLowerInvariant() switch
             {
-                "c#" or "csharp" => ("csharp", "C#", "10.0", ".cs"),
-                "f#" or "fsharp" => ("fsharp", "F#", "6.0", ".fs"),
+                "c#" or "csharp" => ("csharp", "C#", "13.0", ".cs"),
+                "f#" or "fsharp" => ("fsharp", "F#", "7.0", ".fs"),
                 "spiral" => ("spiral", "Spiral", "2.0", ".spi"),
-                "powershell" or "pwsh" => ("powershell", "PowerShell", "7.0", ".ps1"),
+                "powershell" or "pwsh" => ("powershell", "PowerShell", "7.5", ".ps1"),
                 _ => throw new ArgumentException($"Unrecognized language: {language}")
             };
 
@@ -41,9 +42,7 @@ internal static class InteractiveDocumentExtensions
                     ["version"] = langVersion
                 });
 
-        // `polyglot_notebook` is the canonical metadata key name, but we're still writing `dotnet_interactive` for backwards compatibility
         var kernelInfos = document.Metadata.GetOrAdd("polyglot_notebook", _ => new KernelInfoCollection());
-        document.Metadata["dotnet_interactive"] = kernelInfos;
 
         kernelInfos.DefaultKernelName = kernelName;
         kernelInfos.Add(new(kernelName));

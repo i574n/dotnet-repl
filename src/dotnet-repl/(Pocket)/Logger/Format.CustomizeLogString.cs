@@ -1,6 +1,3 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
 using System;
 using System.IO;
 using System.Linq;
@@ -21,7 +18,7 @@ namespace Pocket;
 
 internal static partial class Format
 {
-    static partial void CustomizeLogString(object value, ref string output)
+    static partial void CustomizeLogString(object? value, ref string? output)
     {
         switch (value)
         {
@@ -73,6 +70,7 @@ internal static partial class Format
             case RequestInput requestInput:
                 writer.Write(requestInput.Prompt);
                 writer.AppendProperties(
+                    (nameof(requestInput.ParameterName), requestInput.ParameterName),
                     (nameof(requestInput.IsPassword), requestInput.IsPassword.ToString()),
                     (nameof(requestInput.InputTypeHint), requestInput.InputTypeHint));
                 break;

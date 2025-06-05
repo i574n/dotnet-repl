@@ -14,11 +14,11 @@ namespace dotnet_repl;
 
 public static class KernelBuilder
 {
-    private static readonly HashSet<string> _nonStickyKernelNames = new()
-    {
+    private static readonly HashSet<string> _nonStickyKernelNames =
+    [
         "value",
         "markdown"
-    };
+    ];
 
     public static CompositeKernel CreateKernel(StartupOptions? options = null)
     {
@@ -31,7 +31,8 @@ public static class KernelBuilder
                               .UseDebugMagicCommand()
                               .UseHelpMagicCommand()
                               .UseImportMagicCommand()
-                              .UseQuitCommand();
+                              .UseQuitCommand()
+                              .UseNuGetExtensions();
 
         compositeKernel.AddMiddleware(async (command, context, next) =>
         {
@@ -43,7 +44,7 @@ public static class KernelBuilder
             {
                 var name = command.ToString()?.Replace("Directive: #!", "");
 
-                if (name is { } &&
+                if (name is not null &&
                     !_nonStickyKernelNames.Contains(name) &&
                     rootKernel.FindKernelByName(name) is { } kernel)
                 {
@@ -58,7 +59,7 @@ public static class KernelBuilder
                 .UseKernelHelpers()
                 .UseWho()
                 .UseValueSharing(),
-            new[] { "c#", "C#" });
+            ["c#", "C#"]);
 
         compositeKernel.Add(
             new FSharpKernel()
@@ -67,8 +68,14 @@ public static class KernelBuilder
                 .UseKernelHelpers()
                 .UseWho()
                 .UseValueSharing(),
-            new[] { "f#", "F#" });
+            ["f#", "F#"]);
 
+        var powerShellKernel = new PowerShellKernel()
+                               .UseProfiles()
+                               .UseValueSharing();
+
+        var secretManager = new SecretManager(powerShellKernel);
+        compositeKernel.UseSecretManager(secretManager);
         compositeKernel.Add(
             new SpiralKernel()
                 .UseNugetDirective()
@@ -76,10 +83,8 @@ public static class KernelBuilder
             new[] { "spiral", "Spiral" });
 
         compositeKernel.Add(
-            new PowerShellKernel()
-                .UseProfiles()
-                .UseValueSharing(),
-            new[] { "powershell" });
+            powerShellKernel,
+            ["powershell"]);
 
         compositeKernel.Add(
             new KeyValueStoreKernel()
@@ -93,13 +98,11 @@ public static class KernelBuilder
             var jsKernel = await playwrightConnector.CreateKernelAsync("javascript", BrowserKernelLanguage.JavaScript);
             return (htmlKernel, jsKernel);
         }).Result;
-
-        compositeKernel.Add(jsKernel, new[] { "js" });
+        
+        compositeKernel.Add(jsKernel, ["js"]);
         compositeKernel.Add(htmlKernel);
         compositeKernel.Add(new MarkdownKernel());
         compositeKernel.Add(new Microsoft.DotNet.Interactive.Mermaid.MermaidKernel());
-        // compositeKernel.Add(new SqlDiscoverabilityKernel());
-        // compositeKernel.Add(new KqlDiscoverabilityKernel());
 
         var inputKernel = new InputKernel();
 

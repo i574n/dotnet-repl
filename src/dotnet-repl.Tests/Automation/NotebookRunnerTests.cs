@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.CommandLine.IO;
-using System.CommandLine.Parsing;
+using System.CommandLine;
+using System.CommandLine.Invocation;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -22,8 +22,7 @@ public class NotebookRunnerTests : IDisposable
 {
     private readonly CompositeDisposable _disposables = new();
     private readonly string _directory = Path.GetDirectoryName(PathUtility.PathToCurrentSourceFile());
-    private readonly Parser _parser;
-    private readonly TestConsole console = new();
+    private readonly RootCommand _rootCommand;
 
     private readonly Configuration _assentConfiguration =
         new Configuration()
@@ -40,7 +39,7 @@ public class NotebookRunnerTests : IDisposable
             Out = new AnsiConsoleOutput(writer = new StringWriter())
         });
 
-        _parser = CommandLineParser.Create(ansiConsole, registerForDisposal: d => _disposables.Add(d));
+        _rootCommand = CommandLineParser.Create(ansiConsole, registerForDisposal: d => _disposables.Add(d));
 
         _disposables.Add(writer);
     }
@@ -50,18 +49,22 @@ public class NotebookRunnerTests : IDisposable
     [Fact]
     public async Task When_an_ipynb_is_run_and_no_error_is_produced_then_the_exit_code_is_0()
     {
-        var result = await _parser.InvokeAsync($"--run \"{_directory}/succeed.ipynb\" --exit-after-run", console);
+        var parseResult =_rootCommand.Parse($"--run \"{_directory}/succeed.ipynb\" --exit-after-run");
+        parseResult.Configuration.Error = new StringWriter();
+        var result = await ((AsynchronousCommandLineAction)_rootCommand.Action).InvokeAsync(parseResult);
 
-        console.Error.ToString().Should().BeEmpty();
+        parseResult.Configuration.Error.ToString().Should().BeEmpty();
         result.Should().Be(0);
     }
 
     [Fact]
     public async Task When_an_ipynb_is_run_and_an_error_is_produced_from_a_cell_then_the_exit_code_is_2()
     {
-        var result = await _parser.InvokeAsync($"--run \"{_directory}/fail.ipynb\" --exit-after-run", console);
+        var parseResult = _rootCommand.Parse($"--run \"{_directory}/fail.ipynb\" --exit-after-run");
+        parseResult.Configuration.Error = new StringWriter();
+        var result = await ((AsynchronousCommandLineAction)_rootCommand.Action).InvokeAsync(parseResult);
 
-        console.Error.ToString().Should().BeEmpty();
+        parseResult.Configuration.Error.ToString().Should().BeEmpty();
         result.Should().Be(2);
     }
 
@@ -79,13 +82,13 @@ public class NotebookRunnerTests : IDisposable
 
         var runner = new NotebookRunner(kernel);
 
-        var outputDoc =     await runner.RunNotebookAsync(document);
+        var outputDoc = await runner.RunNotebookAsync(document);
 
         outputDoc = Notebook.Parse(outputDoc.ToJupyterJson());
 
         outputDoc.GetDefaultKernelName().Should().Be("fsharp");
     }
-    
+
     [Fact]
     public async Task Notebook_runner_produces_expected_output()
     {
@@ -110,16 +113,14 @@ public class NotebookRunnerTests : IDisposable
 
     [Theory]
     [InlineData("abc")]
-    [InlineData("ABC")] 
+    [InlineData("ABC")]
     public async Task Parameters_can_be_passed_to_input_fields_declared_in_the_notebook(string passedParamName)
     {
-        var dibContent = @"
-#!value --name abc --from-value @input:""abc""
-
-#!csharp
-#!share --from value abc
-abc.Display();
-";
+        var dibContent = """
+                         #!csharp
+                         #!set --name abc --value @input:"abc"
+                         abc.Display();
+                         """;
         var inputs = new Dictionary<string, string>
         {
             [passedParamName] = "hello!"
@@ -153,7 +154,7 @@ abc.Display();
     {
         foreach (var element in document.Elements)
         {
-            if (element.Metadata is { })
+            if (element.Metadata is not null)
             {
                 if (element.Metadata.ContainsKey("dotnet_repl_cellExecutionStartTime"))
                 {

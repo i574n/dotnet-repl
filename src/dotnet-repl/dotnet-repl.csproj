@@ -6,6 +6,7 @@
     <LangVersion>preview</LangVersion>
     <RollForward>LatestMajor</RollForward>
     <Nullable>enable</Nullable>
+    <DotNetInteractiveVersion>1.0.0-beta.25264.2</DotNetInteractiveVersion>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
   </PropertyGroup>
@@ -17,7 +18,7 @@
     <PackageTags>dotnet interactive REPL csharp fsharp Jupyter</PackageTags>
     <PackAsTool>true</PackAsTool>
     <Authors>jonsequitur</Authors>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <Description>A polyglot command line REPL for C#, F#, SQL, and other languages.</Description>
     <RepositoryUrl>https://github.com/jonsequitur/dotnet-repl</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -39,21 +40,20 @@
     <ProjectReference Include="../../../dotnet-interactive/src/Microsoft.DotNet.Interactive.Http/Microsoft.DotNet.Interactive.Http.csproj" />
     <ProjectReference Include="../../../dotnet-interactive/src/Microsoft.DotNet.Interactive.PackageManagement/Microsoft.DotNet.Interactive.PackageManagement.csproj" />
     <ProjectReference Include="../../../dotnet-interactive/src/Microsoft.DotNet.Interactive.PowerShell/Microsoft.DotNet.Interactive.PowerShell.csproj" />
-
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageReference Include="radline" Version="0.7.0" />
     <PackageReference Include="Serilog.Sinks.RollingFileAlternate" Version="2.0.9" />
-    <PackageReference Include="Spectre.Console" Version="0.48.1-preview.0.35" />
+    <PackageReference Include="Spectre.Console" Version="0.48.1-preview.0.36" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta5.25265.1" />
     <PackageReference Include="trexlib" Version="1.0.188" />
-    <PackageReference Include="pocket.disposable" Version="1.1.0">
+    <PackageReference Include="pocket.disposable" Version="1.2.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="PocketLogger" Version="0.8.2">
+    <PackageReference Include="PocketLogger" Version="0.9.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="PocketLogger.Subscribe" Version="0.8.0">
+    <PackageReference Include="PocketLogger.Subscribe" Version="0.9.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
