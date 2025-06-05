@@ -17,7 +17,6 @@ using Microsoft.DotNet.Interactive.FSharp;
 using Microsoft.DotNet.Interactive.Spiral;
 using Microsoft.DotNet.Interactive.PackageManagement;
 using Microsoft.DotNet.Interactive.PowerShell;
-using Microsoft.DotNet.Interactive.Directives;
 using Recipes;
 using Spectre.Console;
 
@@ -283,7 +282,7 @@ internal static class KernelExtensions
                 return;
             }
 
-            if (secretManager.TryGetValue(requestInput.SaveAs, out var value))
+            if (secretManager.TryGetSecret(requestInput.SaveAs, out var value))
             {
                 context.Publish(new InputProduced(value, requestInput));
 
@@ -305,7 +304,7 @@ internal static class KernelExtensions
                     if (@event is InputProduced inputProduced &&
                         inputProduced.Command.GetOrCreateToken() == requestInput.GetOrCreateToken())
                     {
-                        secretManager.SetValue(requestInput.SaveAs, inputProduced.Value);
+                        secretManager.SetSecret(requestInput.SaveAs, inputProduced.Value);
 
                         var message =
                             $"""
