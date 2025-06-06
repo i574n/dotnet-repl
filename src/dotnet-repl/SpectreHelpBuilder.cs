@@ -105,10 +105,10 @@ internal class SpectreHelpBuilder : HelpBuilder
                     return InAngleBrackets($"{option.HelpName}");
                 }
 
-                if (option.ValueType == typeof(bool))
-                {
-                    return "";
-                }
+                // if (option.ValueType == typeof(bool))
+                // {
+                //     return "";
+                // }
 
                 var completions = option.GetCompletions(CompletionContext.Empty).ToArray();
                 if (completions.Length > 0)

@@ -282,7 +282,7 @@ internal static class KernelExtensions
                 return;
             }
 
-            if (secretManager.TryGetSecret(requestInput.SaveAs, out var value))
+            if (secretManager.TryGetValue(requestInput.SaveAs, out var value))
             {
                 context.Publish(new InputProduced(value, requestInput));
 
@@ -304,7 +304,7 @@ internal static class KernelExtensions
                     if (@event is InputProduced inputProduced &&
                         inputProduced.Command.GetOrCreateToken() == requestInput.GetOrCreateToken())
                     {
-                        secretManager.SetSecret(requestInput.SaveAs, inputProduced.Value);
+                        secretManager.SetValue(requestInput.SaveAs, inputProduced.Value);
 
                         var message =
                             $"""

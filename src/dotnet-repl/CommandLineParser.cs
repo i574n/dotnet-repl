@@ -27,14 +27,15 @@ public static class CommandLineParser
             Description = "The default language for the kernel",
             DefaultValueFactory = _ => Environment.GetEnvironmentVariable("DOTNET_REPL_DEFAULT_KERNEL") ?? "spiral"
         }
-        .AcceptOnlyFromAmong(
-            "csharp",
-            "fsharp",
-            "spiral",
-            "pwsh",
-            "javascript",
-            "mermaid",
-            "http");
+        ;
+        // .AcceptOnlyFromAmong(
+        //     "csharp",
+        //     "fsharp",
+        //     "spiral",
+        //     "pwsh",
+        //     "javascript",
+        //     "mermaid",
+        //     "http");
 
     public static Option<FileInfo> RunOption = new Option<FileInfo>("--run")
         {
@@ -85,7 +86,7 @@ public static class CommandLineParser
         {
             Description = $"Run the file specified by {RunOption.Name} and writes the output to the file specified by --output-path"
         }
-        .AcceptLegalFilePathsOnly();
+        ; //.AcceptLegalFilePathsOnly();
 
     public static Option<OutputFormat> OutputFormatOption = new("--output-format")
     {
