@@ -268,10 +268,10 @@ public class NotebookRunner
                         new Thread(() =>
                         {
                             AnsiConsole.Console.WriteLine("NotebookRunner.RunNotebookAsync / exiting... 3");
-                            Thread.Sleep(300);
+                            Thread.Sleep(1000);
                             AnsiConsole.Console.WriteLine("NotebookRunner.RunNotebookAsync / exiting... 2");
                             System.Console.Out.Flush();
-                            Thread.Sleep(60);
+                            Thread.Sleep(500);
                             AnsiConsole.Console.WriteLine("NotebookRunner.RunNotebookAsync / exiting... 1");
                             AnsiConsole.Console.WriteLine($"NotebookRunner.RunNotebookAsync / event: {@event}");
                             System.Diagnostics.Process.GetCurrentProcess().Kill();
