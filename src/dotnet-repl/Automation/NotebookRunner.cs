@@ -265,17 +265,17 @@ public class NotebookRunner
                         outputs.Add(CreateErrorOutputElement(failed));
                         tcs.SetResult();
 
-                        new Thread(() =>
-                        {
-                            AnsiConsole.Console.WriteLine("NotebookRunner.RunNotebookAsync / exiting... 3");
-                            Thread.Sleep(1000);
-                            AnsiConsole.Console.WriteLine("NotebookRunner.RunNotebookAsync / exiting... 2");
-                            System.Console.Out.Flush();
-                            Thread.Sleep(500);
-                            AnsiConsole.Console.WriteLine("NotebookRunner.RunNotebookAsync / exiting... 1");
-                            AnsiConsole.Console.WriteLine($"NotebookRunner.RunNotebookAsync / event: {@event}");
-                            System.Diagnostics.Process.GetCurrentProcess().Kill();
-                        }).Start();
+                        // new Thread(() =>
+                        // {
+                        //     AnsiConsole.Console.WriteLine("NotebookRunner.RunNotebookAsync / exiting... 3");
+                        //     Thread.Sleep(1000);
+                        //     AnsiConsole.Console.WriteLine("NotebookRunner.RunNotebookAsync / exiting... 2");
+                        //     System.Console.Out.Flush();
+                        //     Thread.Sleep(500);
+                        //     AnsiConsole.Console.WriteLine("NotebookRunner.RunNotebookAsync / exiting... 1");
+                        //     AnsiConsole.Console.WriteLine($"NotebookRunner.RunNotebookAsync / event: {@event}");
+                        //     System.Diagnostics.Process.GetCurrentProcess().Kill();
+                        // }).Start();
 
                         break;
 
