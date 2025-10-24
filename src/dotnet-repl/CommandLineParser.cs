@@ -113,7 +113,7 @@ public static class CommandLineParser
         };
 
         var helpOption = rootCommand.Options.OfType<HelpOption>().Single();
-        (helpOption.Action as HelpAction)!.Builder = new SpectreHelpBuilder();
+        // (helpOption.Action as HelpAction)!.Builder = new SpectreHelpBuilder();
 
         startRepl ??= StartAsync;
 

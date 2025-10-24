@@ -43,7 +43,7 @@
     <PackageReference Include="radline" Version="0.7.0" />
     <PackageReference Include="Serilog.Sinks.RollingFileAlternate" Version="2.0.9" />
     <PackageReference Include="Spectre.Console" Version="0.48.1-preview.0.36" />
-    <ProjectReference Include="../../deps/command-line-api/src/System.CommandLine/System.CommandLine.csproj" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-rc.2.25502.107" />
     <PackageReference Include="trexlib" Version="1.0.188" />
     <PackageReference Include="pocket.disposable" Version="1.2.0">
       <PrivateAssets>all</PrivateAssets>
