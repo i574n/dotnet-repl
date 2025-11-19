@@ -141,7 +141,7 @@ public class NotebookRunner
 
             elementIndex++;
 
-            if (element.Contents.StartsWith("//// ignore"))
+            if (element.Contents.StartsWith("///- ") && element.Contents.Contains("--ignore"))
             {
                 printCell(null, $"{element.KernelName} - ignored", element.Contents, null);
                 continue;
